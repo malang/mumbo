@@ -1,6 +1,7 @@
 import imaplib
 from pprint import pprint
 import os
+import email
 
 
 def open_connection():
@@ -28,20 +29,22 @@ def get_inboxes():
         c.logout()
 
 
-
-import email
-def get_message():
-    """docstring for get_message"""
+def get_messages():
+    """Returns all messages from the inbox"""
+    results = []
     c = open_connection()
     try:
         c.select('INBOX', readonly=True)
-        
-        typ, msg_data = c.fetch('1', '(RFC822)')
-        for response_part in msg_data:
-            if isinstance(response_part, tuple):
-                msg = email.message_from_string(response_part[1])
-                for header in [ 'subject', 'to', 'from' ]:
-                    print '%-8s: %s' % (header.upper(), msg[header])
+        typ, mids = c.search(None, 'ALL')
+
+        for mid in mids:
+            typ, msg_data = c.fetch(mid, '(RFC822)')
+            for response_part in msg_data:
+                if isinstance(response_part, tuple):
+                    msg = email.message_from_string(response_part[1])
+                    results.append(msg)
+                    for header in [ 'subject', 'to', 'from' ]:
+                        print '%-8s: %s' % (header.upper(), msg[header])
 
     finally:
         try:
@@ -49,13 +52,16 @@ def get_message():
         except:
             pass
         c.logout()
+    return results
 
-
-
-
-
+# NOT IMPLEMENTTED
+def remove_message(message):
+    """Remove the message from the server"""
+    pass
 
 
 if __name__ == '__main__':
     get_inboxes()
-    get_message()
+    res = get_messages()
+    print res
+
