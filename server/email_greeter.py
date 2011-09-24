@@ -4,12 +4,12 @@
 import hashlib
 import simplejson as json
 import re
-
+import db
 
 import get_email
 
 exlude_filters = ['Re:', 'Fwd:']
-regc = re.compile('(re:|fwd:)')
+regc = re.compile('(re:|fwd:)', flags=re.I)
 
 
 # this is what email obj should look like - ideally
@@ -21,20 +21,36 @@ email_obj = {
     'thread_id' : ''
     }
 
+# ['Content-Type', 'MIME-Version', 'Received', 'Received', 'Dkim-Signature', 
+#  'Received', 'Received', 'From', 'Date', 'Message-Id', 'Subject', 'To']
+
 def process_subject(subj):
     """gets raw subject and returns the normalized version"""
-    # todo: smarter normalization
-    return ''
-
+    subj = subj.strip()
+    return re.sub(regc, '', subj).strip()
 
 def process_email(email):
     # todo: remove the re  / fwd stuff from the subj
     cleaned_subj = process_subject(email['subject'])
+    print cleaned_subj
 
 def do_poll():
     """Poll the message server and process the results"""
+    drop = ['Dkim-Signature', ]
     msgs = get_email.get_messages()
-    print msgs
+    for msg in msgs:
+        topheaders = ['To', 'From', 'Message-Id']
+        msgobj = dict([(x,msg[x]) for x in topheaders])
+        
+        print('Message subject %s' %msg['Subject'])
+        subjkey = process_subject(msg['Subject'])
+        msgobj['Subject'] = subjkey
+        msgobj['Content'] = msg.as_string()
+       
+        print subjkey
+        db.write_thread(subjkey, msgobj)
+
+    # print [msg.keys() for msg in msgs]
 
 
 def start():

@@ -36,15 +36,15 @@ def get_messages():
     try:
         c.select('INBOX', readonly=True)
         typ, mids = c.search(None, 'ALL')
+        mids = mids[0].replace(' ', ',')
 
-        for mid in mids:
-            typ, msg_data = c.fetch(mid, '(RFC822)')
-            for response_part in msg_data:
-                if isinstance(response_part, tuple):
-                    msg = email.message_from_string(response_part[1])
-                    results.append(msg)
-                    for header in [ 'subject', 'to', 'from' ]:
-                        print '%-8s: %s' % (header.upper(), msg[header])
+        typ, msg_data = c.fetch(mids, '(RFC822)')
+        for response_part in msg_data:
+            if isinstance(response_part, tuple):
+                msg = email.message_from_string(response_part[1])
+                results.append(msg)
+                # for header in [ 'subject', 'to', 'from' ]:
+                    # print '%-8s: %s' % (header.upper(), msg[header])
 
     finally:
         try:
