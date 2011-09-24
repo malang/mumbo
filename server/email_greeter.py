@@ -3,8 +3,10 @@
 
 import hashlib
 import simplejson as json
+import re
 
 exlude_filters = ['Re:', 'Fwd:']
+re.compile('(re:|fwd:)')
 
 
 # this is what email obj should look like - ideally
@@ -25,8 +27,4 @@ def process_subject(subj):
 def process_email(email):
     # todo: remove the re  / fwd stuff from the subj
     cleaned_subj = process_subject(email['subject'])
-    subj_hash = 
-
-
-
 

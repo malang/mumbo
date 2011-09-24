@@ -8,7 +8,12 @@ from pymongo import Connection
 def _return_conn():
     return pymongo.Connection().mumbo
 
-def write_thread(emobj):
+def write_thread(client, key, emobj):
+    """ 
+    client: 
+    key: normalized subj
+    emboj: the email obj
+    """
     db = _return_conn()
     db.test.insert({"x": "y", "a": "b"})
 
