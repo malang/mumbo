@@ -30,7 +30,7 @@ def process_subject(subj):
     return re.sub(regc, '', subj).strip()
 
 def process_email(email):
-    # todo: remove the re  / fwd stuff from the subj
+    # todo: remove the re / fwd stuff from the subj
     cleaned_subj = process_subject(email['subject'])
     print cleaned_subj
 
@@ -39,10 +39,11 @@ def do_poll():
     drop = ['Dkim-Signature', ]
     msgs = get_email.get_messages()
     for msg in msgs:
-        topheaders = ['To', 'From', 'Message-Id']
+        topheaders = ['To', 'From', 'Message-Id', 'Date']
         msgobj = dict([(x,msg[x]) for x in topheaders])
         
         print('Message subject %s' %msg['Subject'])
+        print('Message date %s' %msg['Date'])
         subjkey = process_subject(msg['Subject'])
         msgobj['Subject'] = subjkey
         msgobj['Content'] = msg.as_string()
@@ -55,6 +56,7 @@ def do_poll():
 
 def start():
     """docstring for start"""
+    db.reset()
     do_poll()
 
 

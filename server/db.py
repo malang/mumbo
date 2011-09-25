@@ -17,7 +17,14 @@ def write_thread(key, msg):
     db = _return_conn()
     db.test.insert({'thread': key, 'msg': msg})
 
+def reset():
+    """ 
+    client: 
+    key: normalized subj
+    emboj: the email obj
+    """
+    db = _return_conn()
+    db.test.drop()
+
 if __name__ == '__main__':
     write_thread({})
-
-

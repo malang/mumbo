@@ -31,13 +31,14 @@ def get_inboxes():
 
 def get_messages():
     """Returns all messages from the inbox"""
+
     results = []
     c = open_connection()
     try:
         c.select('INBOX', readonly=True)
         typ, mids = c.search(None, 'ALL')
         mids = mids[0].replace(' ', ',')
-
+        
         typ, msg_data = c.fetch(mids, '(RFC822)')
         for response_part in msg_data:
             if isinstance(response_part, tuple):
@@ -45,7 +46,7 @@ def get_messages():
                 results.append(msg)
                 # for header in [ 'subject', 'to', 'from' ]:
                     # print '%-8s: %s' % (header.upper(), msg[header])
-
+        
     finally:
         try:
             c.close()
